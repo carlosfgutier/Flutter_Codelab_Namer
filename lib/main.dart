@@ -180,12 +180,19 @@ class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var pair = appState.current;
+    var favorites = appState.favorites;
+
+    // Write a for loop or map that creates a small card per item in favorites
+    // Add a favorite icon to the right of each small card
+    // Add functionality to unfavorite from Favorites page
+    // Add a third screen to keep unfavorited pairs
+    // Add functionality to refavorite
+    // Add functionality to delete forever
 
     return Center(
       child: ListView(
         children: [
-          SmallCard(pair: pair),
+          SmallCard(pair: favorites[0]),
           SizedBox(height: 10),
         ],
       ),
