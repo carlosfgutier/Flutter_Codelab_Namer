@@ -76,12 +76,16 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     
     Widget page;
+    Color background = Theme.of(context).colorScheme.primaryContainer;
     switch (selectedIndex) {
       case 0:
         page = GeneratorPage();
+        background = Theme.of(context).colorScheme.primaryContainer;
         break;
       case 1:
-        page = Placeholder();
+        page = FavoritesPage();
+        background = Theme.of(context).colorScheme.secondaryContainer;
+
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -115,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Expanded(
                 child: Container(
-                  color: Theme.of(context).colorScheme.primaryContainer,
+                  color: background,
                   child: page,
                 ),
               ),
@@ -172,6 +176,23 @@ class GeneratorPage extends StatelessWidget {
   }
 }
 
+class FavoritesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var pair = appState.current;
+
+    return Center(
+      child: ListView(
+        children: [
+          SmallCard(pair: pair),
+          SizedBox(height: 10),
+        ],
+      ),
+    );
+  }
+}
+
 class BigCard extends StatelessWidget {
   const BigCard({
     super.key,
@@ -192,6 +213,32 @@ class BigCard extends StatelessWidget {
           pair, 
           style: style,
           gradient: LinearGradient(colors: rainbowColors),
+        ),
+      ),
+    );
+  }
+}
+
+class SmallCard extends StatelessWidget {
+  const SmallCard({
+    super.key,
+    required this.pair,
+  });
+
+  final WordPair pair;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context); 
+    final style = theme.textTheme.bodyLarge!.copyWith();
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Text(
+          "\u2022 ${pair.asPascalCase}", 
+          style: style,
+          semanticsLabel: "${pair.first} ${pair.second}",
         ),
       ),
     );
