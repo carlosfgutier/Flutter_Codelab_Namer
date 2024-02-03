@@ -1,16 +1,22 @@
 # namer_app
 
-A new Flutter project.
+This is a simple app that generates random word pairs and allows users to like them. Liking a word pair sends it to Favorites. 
+
+Word pairs removed from Favorites are sent to the trash. From the trash screen, word pairs can be liked again or deleted forever.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This is my first Flutter app.
 
-A few resources to get you started if this is your first Flutter project:
+Some features that were not part of the tutorial steps:
+- A third screen for unliked word pairs
+- Ability to re-like unliked word pairs
+- Rainbow gradient font because why not
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Quick Demo
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+https://github.com/carlosfgutier/Flutter_Codelab_Namer/assets/32309483/b263274a-95b1-4763-bd69-fa8dd31ced81
+
+
+
+
