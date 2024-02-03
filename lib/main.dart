@@ -47,6 +47,7 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
   var favorites = <WordPair>[];
+  var deletedFavorites = <WordPair>[];
 
   void getNext() {
     current = WordPair.random();
@@ -59,6 +60,12 @@ class MyAppState extends ChangeNotifier {
     } else {
       favorites.add(current);
     }
+    notifyListeners();
+  }
+
+  void deleteFavorite() {
+      favorites.remove(current);
+      deletedFavorites.add(current);
     notifyListeners();
   }
 }
@@ -84,9 +91,12 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       case 1:
         page = FavoritesPage();
-        background = Theme.of(context).colorScheme.secondaryContainer;
-
+        background = Theme.of(context).colorScheme.tertiaryContainer;
         break;
+      case 2:
+        page = DeletedPage();
+        background = Theme.of(context).colorScheme.secondaryContainer;
+      break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
@@ -107,6 +117,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     NavigationRailDestination(
                       icon: Icon(Icons.favorite),
                       label: Text('Favorites'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.delete),
+                      label: Text('Deleted'),
                     ),
                   ],
                   selectedIndex: selectedIndex,
@@ -185,6 +199,24 @@ class FavoritesPage extends StatelessWidget {
     // Write a for loop or map that creates a small card per item in favorites
     // Add a favorite icon to the right of each small card
     // Add functionality to unfavorite from Favorites page
+
+    return Center(
+      child: ListView(
+        children: [
+          FavoritesCard(pair: favorites[0]),
+          SizedBox(height: 10),
+        ],
+      ),
+    );
+  }
+}
+
+class DeletedPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var deletedFavorites = appState.deletedFavorites;
+
     // Add a third screen to keep unfavorited pairs
     // Add functionality to refavorite
     // Add functionality to delete forever
@@ -192,7 +224,13 @@ class FavoritesPage extends StatelessWidget {
     return Center(
       child: ListView(
         children: [
-          SmallCard(pair: favorites[0]),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Re-favorite words pairs or deleted them forever"),
+            ],
+          ),
+          DeletedCard(pair: deletedFavorites[0]),
           SizedBox(height: 10),
         ],
       ),
@@ -226,8 +264,48 @@ class BigCard extends StatelessWidget {
   }
 }
 
-class SmallCard extends StatelessWidget {
-  const SmallCard({
+class FavoritesCard extends StatelessWidget {
+  const FavoritesCard({
+    super.key,
+    required this.pair,
+  });
+
+  final WordPair pair;
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
+    final theme = Theme.of(context); 
+    final style = theme.textTheme.bodyLarge!.copyWith();
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                pair.asPascalCase, 
+                style: style,
+                semanticsLabel: "${pair.first} ${pair.second}",
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                  appState.deleteFavorite();
+                }, 
+              icon: Icon(Icons.delete),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DeletedCard extends StatelessWidget {
+  const DeletedCard({
     super.key,
     required this.pair,
   });
@@ -242,10 +320,28 @@ class SmallCard extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: Text(
-          "\u2022 ${pair.asPascalCase}", 
-          style: style,
-          semanticsLabel: "${pair.first} ${pair.second}",
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                pair.asPascalCase, 
+                style: style,
+                semanticsLabel: "${pair.first} ${pair.second}",
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                  // re-favorite
+                }, 
+              icon: Icon(Icons.favorite),
+            ),
+            IconButton(
+              onPressed: () {
+                  // delete forever
+                }, 
+              icon: Icon(Icons.delete_forever),
+            ),
+          ],
         ),
       ),
     );
