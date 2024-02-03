@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         title: 'Namer App',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 255, 227, 17)),
+          colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 17, 92, 255)),
         ),
         home: MyHomePage(),
       ),
@@ -47,25 +47,37 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
   var favorites = <WordPair>[];
-  var deletedFavorites = <WordPair>[];
+  var deletedFavs = <WordPair>[];
 
   void getNext() {
     current = WordPair.random();
     notifyListeners();
   }
 
-  void toggleFavorite() {
-    if (favorites.contains(current)) {
-      favorites.remove(current);
+  void toggleFavorite(wordPair) {
+    if (favorites.contains(wordPair)) {
+      favorites.remove(wordPair);
     } else {
-      favorites.add(current);
+      favorites.add(wordPair);
+      deletedFavs.remove(wordPair);
     }
     notifyListeners();
   }
 
-  void deleteFavorite() {
-      favorites.remove(current);
-      deletedFavorites.add(current);
+  void deleteFavorite(wordPair) {
+      favorites.remove(wordPair);
+      deletedFavs.add(wordPair);
+    notifyListeners();
+  }
+
+  void reFavorite(wordPair) {
+    if (!favorites.contains(wordPair)){
+      favorites.add(wordPair);
+    }
+  }
+
+  void deleteForever(wordPair) {
+      deletedFavs.remove(wordPair);
     notifyListeners();
   }
 }
@@ -170,7 +182,7 @@ class GeneratorPage extends StatelessWidget {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  appState.toggleFavorite();
+                  appState.toggleFavorite(pair);
                 },
                 icon: Icon(icon),
                 label: Text('Like'),
@@ -196,14 +208,11 @@ class FavoritesPage extends StatelessWidget {
     var appState = context.watch<MyAppState>();
     var favorites = appState.favorites;
 
-    // Write a for loop or map that creates a small card per item in favorites
-    // Add a favorite icon to the right of each small card
-    // Add functionality to unfavorite from Favorites page
-
     return Center(
       child: ListView(
         children: [
-          FavoritesCard(pair: favorites[0]),
+          for (var favorite in favorites)
+            FavoritesCard(pair: favorite),
           SizedBox(height: 10),
         ],
       ),
@@ -215,7 +224,7 @@ class DeletedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var deletedFavorites = appState.deletedFavorites;
+    var deletedFavs = appState.deletedFavs;
 
     // Add a third screen to keep unfavorited pairs
     // Add functionality to refavorite
@@ -230,7 +239,8 @@ class DeletedPage extends StatelessWidget {
               Text("Re-favorite words pairs or deleted them forever"),
             ],
           ),
-          DeletedCard(pair: deletedFavorites[0]),
+          for (var deletedFav in deletedFavs)
+            DeletedCard(pair: deletedFav),
           SizedBox(height: 10),
         ],
       ),
@@ -293,7 +303,7 @@ class FavoritesCard extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                  appState.deleteFavorite();
+                  appState.deleteFavorite(pair);
                 }, 
               icon: Icon(Icons.delete),
             ),
@@ -314,6 +324,8 @@ class DeletedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
     final theme = Theme.of(context); 
     final style = theme.textTheme.bodyLarge!.copyWith();
 
@@ -331,13 +343,13 @@ class DeletedCard extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                  // re-favorite
+                  appState.toggleFavorite(pair);
                 }, 
               icon: Icon(Icons.favorite),
             ),
             IconButton(
               onPressed: () {
-                  // delete forever
+                  appState.deleteForever(pair);
                 }, 
               icon: Icon(Icons.delete_forever),
             ),
